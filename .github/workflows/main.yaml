@@ -1,8 +1,8 @@
 name: Build Job
 on: 
-  # push:
-  #   branches: 
-  #     - main
+  push:
+    branches: 
+      - main
 
   pull request:
     branches:
