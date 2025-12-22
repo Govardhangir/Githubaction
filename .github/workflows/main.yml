@@ -28,7 +28,8 @@ jobs:
       - name: SonarQube Scan
         run: sonar-scanner
            -Dsonar.host.url=${{ secrets.SONAR_HOST_URL }}
-           -Dsonar.login=${{ secrets.SONAR_TOKEN }}
+           -Dsonar.login=${{ secrets.SONAR_TOKEN }
+           -Dsonar.projectKey=${{ secrets.SONAR_PROJECT_KEY }}
            -Dsonar.sources=src/
            -Dsonar.junit.reportsPath=target/surefire-reports/ 
            -Dsonar.jacoco.reportsPath=target/jacoco.exec 
