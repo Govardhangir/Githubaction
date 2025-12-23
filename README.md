@@ -32,4 +32,3 @@ Pipeline stages:
 - Trivy Security Scan
 - Push Image to AWS ECR
 - Deploy to Amazon ECS
-#
