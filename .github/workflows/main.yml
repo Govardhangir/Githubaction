@@ -38,8 +38,8 @@ jobs:
     - name: Login to Amazon ECR
       uses: aws-actions/amazon-ecr-login@v2
 
-    - name: Build Docker Image
-      run: docker build -t spring-mvc-app:latest .Docker-files/app/.
+    - name: Docker Image Build
+      run: docker build -t your-image-name:latest ./Docker-files/app/.
 
     - name: Trivy Image Scan
       uses: aquasecurity/trivy-action@master
