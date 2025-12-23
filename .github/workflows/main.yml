@@ -38,8 +38,8 @@ jobs:
     - name: Login to Amazon ECR
       uses: aws-actions/amazon-ecr-login@v2
 
-    - name: Build Docker Images with compose
-      run: docker-compose build app
+    - name: Install docker-compose
+      run: sudo apt-get update && sudo apt-get install docker-compose -y
 
     - name: Trivy Image Scan
       uses: aquasecurity/trivy-action@master
