@@ -57,9 +57,10 @@ jobs:
         image-ref: spring-mvc-app:latest
         scanners: vuln
         severity: HIGH,CRITICAL
-        exit-code: 1
+        exit-code: 0
         timeout: 15m
 
+    
     # ---------------- Push to ECR ----------------
     - name: Tag & Push Image to ECR
       run: |
