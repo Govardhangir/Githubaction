@@ -9,18 +9,22 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+    # ---------------- Checkout ----------------
     - name: Checkout Code
       uses: actions/checkout@v4
 
+    # ---------------- Java Setup ----------------
     - name: Setup JDK 21
       uses: actions/setup-java@v3
       with:
         distribution: temurin
         java-version: 21
 
+    # ---------------- Maven Build ----------------
     - name: Maven Build
       run: mvn clean verify
 
+    # ---------------- SonarQube ----------------
     - name: SonarQube Scan
       run: |
         mvn sonar:sonar \
@@ -28,6 +32,7 @@ jobs:
         -Dsonar.host.url=${{ secrets.SONAR_HOST_URL }} \
         -Dsonar.login=${{ secrets.SONAR_TOKEN }}
 
+    # ---------------- AWS Auth ----------------
     - name: Configure AWS Credentials
       uses: aws-actions/configure-aws-credentials@v4
       with:
@@ -38,9 +43,14 @@ jobs:
     - name: Login to Amazon ECR
       uses: aws-actions/amazon-ecr-login@v2
 
-    - name: Docker Image Build
-      run: docker build -t your-image-name:latest ./Docker-files/app/.
+    # ---------------- Docker Build ----------------
+    - name: Build Docker Image
+      run: |
+        docker build \
+        -f Docker-files/app/Dockerfile \
+        -t spring-mvc-app:latest .
 
+    # ---------------- Trivy Scan ----------------
     - name: Trivy Image Scan
       uses: aquasecurity/trivy-action@master
       with:
@@ -50,6 +60,7 @@ jobs:
         exit-code: 1
         timeout: 15m
 
+    # ---------------- Push to ECR ----------------
     - name: Tag & Push Image to ECR
       run: |
         docker tag spring-mvc-app:latest \
