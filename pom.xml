@@ -255,6 +255,7 @@
     <build>
         <plugins>
             <!-- Jetty Plugin -->
+
             <plugin>
                 <groupId>org.eclipse.jetty</groupId>
                 <artifactId>jetty-maven-plugin</artifactId>
@@ -264,6 +265,13 @@
                         <contextPath>/</contextPath>
                     </webApp>
                 </configuration>
+            </plugin>
+
+
+            <plugin>
+                <groupId>org.sonarsource.scanner.maven</groupId>
+                <artifactId>sonar-maven-plugin</artifactId>
+                <version>3.11.0.3922</version>
             </plugin>
 
             <!-- Maven War Plugin -->

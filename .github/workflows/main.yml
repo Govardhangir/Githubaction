@@ -1,32 +1,59 @@
-name: Workflow Actions
+name: CI-CD Pipeline
 
 on:
-  workflow_dispatch:
+  push:
+    branches: [ "main" ]
 
 jobs:
-  Testing:
-    runs-on: self-hosted
+  build-scan-push:
+    runs-on: ubuntu-latest
 
     steps:
-      - name: Code checkout
-        uses: actions/checkout@v4
+    - name: Checkout Code
+      uses: actions/checkout@v4
 
-      - name: Set Java 17
-        uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: '17'
+    - name: Setup JDK 21
+      uses: actions/setup-java@v3
+      with:
+        distribution: temurin
+        java-version: 21
 
-      - name: Maven test
-        run: mvn test
+    - name: Maven Build
+      run: mvn clean verify
 
-      - name: Checkstyle
-        run: mvn checkstyle:checkstyle
+    - name: SonarQube Scan
+      run: |
+        mvn sonar:sonar \
+        -Dsonar.projectKey=spring-mvc-app \
+        -Dsonar.host.url=${{ secrets.SONAR_HOST_URL }} \
+        -Dsonar.login=${{ secrets.SONAR_TOKEN }}
 
-      - name: SonarQube Scan
-        run: |
-          sonar-scanner \
-            -Dsonar.host.url=${{ secrets.SONAR_HOST_URL }} \
-            -Dsonar.login=${{ secrets.SONAR_TOKEN }} \
-            -Dsonar.projectKey=${{ secrets.SONAR_PROJECT_KEY }} \
-            -Dsonar.sources=src
+    - name: Configure AWS Credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ secrets.AWS_REGION }}
+
+    - name: Login to Amazon ECR
+      uses: aws-actions/amazon-ecr-login@v2
+
+    - name: Build Docker Image
+      run: docker build -t spring-mvc-app:latest .
+
+    - name: Trivy Image Scan
+      uses: aquasecurity/trivy-action@master
+      with:
+        image-ref: spring-mvc-app:latest
+        scanners: vuln
+        severity: HIGH,CRITICAL
+        exit-code: 1
+        timeout: 15m
+
+    - name: Tag & Push Image to ECR
+      run: |
+        docker tag spring-mvc-app:latest \
+        ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/${{ secrets.ECR_REPOSITORY }}:latest
+
+        docker push \
+        ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/${{ secrets.ECR_REPOSITORY }}:latest
