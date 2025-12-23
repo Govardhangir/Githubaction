@@ -23,3 +23,12 @@ sql dump file:
 - > mysql -u <user_name> -p accounts < db_backup.sql
 
 
+## CI/CD Overview
+This project uses GitHub Actions for CI/CD.
+Pipeline stages:
+- Maven Build & Test
+- SonarQube Code Quality Scan
+- Docker Image Build
+- Trivy Security Scan
+- Push Image to AWS ECR
+- Deploy to Amazon ECS
