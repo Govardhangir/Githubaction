@@ -48,7 +48,7 @@ jobs:
       run: |
         docker build \
         -f Docker-files/app/Dockerfile \
-        -t spring-mvc-app:latest .
+        -t vprofileapp:latest .
 
     # ---------------- Trivy Scan ----------------
     - name: Trivy Image Scan
@@ -64,7 +64,7 @@ jobs:
     # ---------------- Push to ECR ----------------
     - name: Tag & Push Image to ECR
       run: |
-        docker tag spring-mvc-app:latest \
+        docker tag vprofileapp:latest \
         ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/${{ secrets.ECR_REPOSITORY }}:latest
 
         docker push \
